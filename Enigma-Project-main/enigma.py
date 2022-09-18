@@ -42,6 +42,8 @@ SETTINGS = {
     "PLUGBOARD": []
 }
 
+selectWheel = 0
+
 def apply_settings(ukw, wheel, wheel_pos, plugboard):
     if not ukw in UKW:
         raise ArgumentError(f"UKW {ukw} does not exist!")
@@ -51,6 +53,7 @@ def apply_settings(ukw, wheel, wheel_pos, plugboard):
     for wh in wheels:
         if not wh in WHEELS:
             raise ArgumentError(f"WHEEL {wh} does not exist!")
+        selectWheel = wh
         SETTINGS["WHEELS"].append(WHEELS[wh])
 
     wheel_poses = wheel_pos.split(' ')
@@ -85,7 +88,13 @@ def pass_etw(input):
 def pass_wheels(input, reverse = False):
     # Implement Wheel Logics
     # Keep in mind that reflected signals pass wheels in reverse order
-    return input
+    count = ord(input) % ord('A')
+    ans = ""
+    if reverse:
+        ans = SETTINGS["WHEELS"][selectWheel]["wire"][25-count]
+    else:
+        ans = SETTINGS["WHEELS"][selectWheel]["wire"][count]
+    return ans
 
 # UKW
 def pass_ukw(input):
@@ -93,7 +102,18 @@ def pass_ukw(input):
 
 # Wheel Rotation
 def rotate_wheels():
-    # Implement Wheel Rotation Logics
+
+    stri = ""
+    for wrd in SETTINGS["WHEELS"][selectWheel]["wire"]:
+
+        if (ord(wrd) + SETTINGS["WHEELS"][selectWheel]["turn"] ) > ord('Z'):
+            stri = stri + chr( (ord(wrd)+ SETTINGS["WHEELS"][selectWheel]["turn"])%ord('Z') + ord('A'))
+        else:
+            stri = stri + chr(ord(wrd)+ SETTINGS["WHEELS"][selectWheel]["turn"])
+
+    SETTINGS["WHEELS"][selectWheel]["wire"] = stri
+    stri = ""
+
     pass
 
 # Enigma Exec Start
