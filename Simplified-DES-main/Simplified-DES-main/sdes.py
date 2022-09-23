@@ -47,6 +47,9 @@ P8 = [ 5, 2, 6, 3, 7, 4, 9, 8 ]
 MODE_ENCRYPT = 1
 MODE_DECRYPT = 2
 
+rkey1 = bitarray()
+rkey2 = bitarray()
+
 '''
 schedule_keys: generate round keys for round function
 returns array of round keys.
@@ -118,9 +121,32 @@ mode determines that this function do encryption or decryption.
 '''
 def sdes(text: bitarray, key: bitarray, mode) -> bitarray:
     result = bitarray()
-    
-    # Place your own implementation of S-DES Here
-    
+    newkey = bitarray()
+    ans = bitarray()
+
+    for i in range(0, 8):
+      result.append(text[IP[i]])
+
+    newkeylist = schedule_keys(key)
+
+    newkey = newkeylist[0]
+    rkey1 = round(result, newkey)
+
+    newkey = newkeylist[1]
+    rkey2 = round(result, newkey)
+
+    if mode == MODE_ENCRYPT:
+        sumkey = rkey1 + rkey2
+        ans = sumkey ^ text
+
+    if mode == MODE_DECRYPT:
+        sumkey = rkey2 + rkey1
+        ans = sumkey ^ text
+
+
+    for i in range(0, 8):
+        result[i] = ans[IP_1[i]]
+
     return result
 
 #### DES Sample Program Start
