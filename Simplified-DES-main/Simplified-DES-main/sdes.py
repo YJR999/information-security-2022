@@ -47,8 +47,7 @@ P8 = [ 5, 2, 6, 3, 7, 4, 9, 8 ]
 MODE_ENCRYPT = 1
 MODE_DECRYPT = 2
 
-rkey1 = bitarray()
-rkey2 = bitarray()
+
 
 '''
 schedule_keys: generate round keys for round function
@@ -87,6 +86,9 @@ def schedule_keys(key: bitarray) -> list[bitarray]:
 round: round function
 returns the output of round function
 '''
+rkey1 = bitarray()
+rkey2 = bitarray()
+
 def round(text: bitarray, round_key: bitarray) -> bitarray:
     # implement round function
     expanded = bitarray()
@@ -123,29 +125,26 @@ def sdes(text: bitarray, key: bitarray, mode) -> bitarray:
     result = bitarray()
     newkey = bitarray()
     ans = bitarray()
+    global rkey1, rkey2
 
     for i in range(0, 8):
       result.append(text[IP[i]])
 
     newkeylist = schedule_keys(key)
 
-    newkey = newkeylist[0]
-    rkey1 = round(result, newkey)
-
-    newkey = newkeylist[1]
-    rkey2 = round(result, newkey)
-
     if mode == MODE_ENCRYPT:
-        sumkey = rkey1 + rkey2
-        ans = sumkey ^ text
+        newkey = newkeylist[0]
+        rkey1 = round(result, newkey)
 
-    if mode == MODE_DECRYPT:
-        sumkey = rkey2 + rkey1
-        ans = sumkey ^ text
+        newkey = newkeylist[1]
+        rkey2 = round(result, newkey)
+
+    sumkey = rkey1 + rkey2 #일정함
+    ans = sumkey ^ result
 
 
     for i in range(0, 8):
-        result[i] = ans[IP_1[i]]
+        result[i] = ans[IP_1[i]]  #change
 
     return result
 
